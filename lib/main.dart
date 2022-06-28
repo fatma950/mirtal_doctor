@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:mirtal_doctor/Screens/Splash/muSplash.dart';
+import 'Screens/Splash/muSplash.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

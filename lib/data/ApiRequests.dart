@@ -1,10 +1,10 @@
 // ignore_for_file: file_names
-
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:mirtal_doctor/Constants/customToast.dart';
 import 'package:mirtal_doctor/Constants/myNavigator.dart';
 import 'package:mirtal_doctor/Screens/bottomNavigation/bottomBar.dart';
@@ -12,11 +12,8 @@ import 'package:mirtal_doctor/models/commentsModel.dart';
 import 'package:mirtal_doctor/models/doctorModel.dart';
 import 'package:mirtal_doctor/models/postsModel.dart';
 import 'package:mirtal_doctor/sharedWidgets/showAndHideLoader.dart';
-// import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Screens/Auth/login.dart';
-import '../Screens/home/homeScreen.dart';
 
 class ApiRequests {
   loginDoctor(String mail, String password, BuildContext context) async {
@@ -30,6 +27,8 @@ class ApiRequests {
 
     http.StreamedResponse response = await request.send();
 
+    hideLoading(context);
+
     if (response.statusCode == 200) {
       var myResponse = await json.decode(await response.stream.bytesToString());
       if (myResponse['message'] == "تسجيل الدخول بنجاح") {
@@ -40,10 +39,8 @@ class ApiRequests {
       } else {
         showFailedToast(myResponse['message']);
       }
-      //print(myResponse);
     } else {
       showFailedToast("لقد حدث خطأ");
-      //print(response.reasonPhrase);
     }
   }
 
@@ -64,11 +61,13 @@ class ApiRequests {
       String region,
       File licenceImg,
       File profileImg) async {
+    showLoading(context);
     var headers = {
       'Content-Type': 'multipart/form-data',
     };
     var request = http.MultipartRequest(
         'POST', Uri.parse('https://mitral.herokuapp.com/auth/signupDoctor'));
+
     request.fields.addAll({
       'email': mail,
       'password': password,
@@ -85,43 +84,50 @@ class ApiRequests {
       'region': region
     });
 
-    // List images = [licenceImg.path, profileImg.path];
-    // List<String> imagestypenames = ["license", "photo"];
+//     request.files.add(await http.MultipartFile.fromPath('license', licenceImg.toString()));
 
-    // List<MultipartFile> newList = <MultipartFile>[];
-    // for (int i = 0; i < images.length; i++) {
-    //   File imageFile = File(images[i].toString());
-    //   var stream = http.ByteStream(imageFile.openRead());
-    //   var length = await imageFile.length();
-    //   var multipartFile = http.MultipartFile(imagestypenames[i], stream, length,
-    //       filename: basename(imageFile.path));
-    //   newList.add(multipartFile);
-    // }
+//     request.files.add(http.MultipartFile.fromBytes(
+//       'license',
+//       licenceImg.readAsBytesSync(),
+//     ));
 
-    // request.files.addAll(newList);
+//  request.files.add(await http.MultipartFile.fromPath('photo', profileImg.toString()));
+//     request.files.add(http.MultipartFile.fromBytes(
+//       'photo',
+//       profileImg.readAsBytesSync(),
+//     ));
 
-    request.files
-        .add(await http.MultipartFile.fromPath('license', licenceImg.path));
-    request.files
-        .add(await http.MultipartFile.fromPath('photo', profileImg.path));
+    final licenseMimeTypeData =
+        lookupMimeType(licenceImg.path, headerBytes: [0xFF, 0xD8])?.split('/');
+
+    request.files.add(await http.MultipartFile.fromPath(
+        'license', licenceImg.path,
+        contentType:
+            MediaType(licenseMimeTypeData![0], licenseMimeTypeData[1])));
+
+    final profileMimeTypeData =
+        lookupMimeType(profileImg.path, headerBytes: [0xFF, 0xD8])?.split('/');
+
+    request.files.add(await http.MultipartFile.fromPath(
+        'photo', profileImg.path,
+        contentType:
+            MediaType(profileMimeTypeData![0], profileMimeTypeData[1])));
 
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
 
-    print(await response.stream.bytesToString());
+    hideLoading(context);
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       var myResponse = await json.decode(await response.stream.bytesToString());
-      if (myResponse['message'] == "تسجيل الدخول بنجاح") {
-        MyNavigetor().push(const HomeScreen(), context);
+      if (myResponse['message'] == "تم الستجيل بنجاح مرحبا بك في مترال") {
+        MyNavigetor().push(const LoginPage(), context);
       } else {
         showFailedToast(myResponse['message']);
       }
-      //print(myResponse);
     } else {
       showFailedToast(response.reasonPhrase.toString());
-      print(response.reasonPhrase);
     }
   }
 
@@ -205,17 +211,16 @@ class ApiRequests {
       'Accept': 'multipart/form-data',
     };
 
-    //print(profilePHoto.uri.authority.toString());
-
     var request = http.MultipartRequest('PUT',
         Uri.parse('https://mitral.herokuapp.com/doctor/account/updatePhoto'));
-    request.files.add(await http.MultipartFile.fromPath(
-        'photo', profilePHoto.path,
-        filename: profilePHoto.path.split("/").last));
+
+    request.files.add(http.MultipartFile.fromBytes(
+        'photo', profilePHoto.readAsBytesSync(),
+        filename: profilePHoto.toString()));
+
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
-    print(await response.stream.bytesToString());
 
     if (response.statusCode == 200) {
       final myResponse = await response.stream.bytesToString();

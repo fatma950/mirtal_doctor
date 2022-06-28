@@ -257,7 +257,8 @@ class _RegistrationState extends State<Registration> {
                           onPressed: () async {
                             final ImagePicker _profilePicker = ImagePicker();
                             final XFile? image = await _profilePicker.pickImage(
-                                source: ImageSource.gallery);
+                              source: ImageSource.gallery,
+                            );
 
                             setState(() {
                               profileImage = File(image!.path);
@@ -298,9 +299,11 @@ class _RegistrationState extends State<Registration> {
                       alignment: Alignment.topRight,
                       child: IconButton(
                           onPressed: () async {
-                            final ImagePicker _licencePicker = ImagePicker();
-                            final XFile? image = await _licencePicker.pickImage(
-                                source: ImageSource.gallery);
+                            final ImagePicker licencePicker = ImagePicker();
+
+                            final XFile? image = await licencePicker.pickImage(
+                              source: ImageSource.gallery,
+                            );
 
                             setState(() {
                               licenceImage = File(image!.path);

@@ -1,7 +1,6 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-
 import 'package:mirtal_doctor/Constants/colors.dart';
 import 'package:mirtal_doctor/Constants/customSizedBox.dart';
 import 'package:mirtal_doctor/Constants/myNavigator.dart';
