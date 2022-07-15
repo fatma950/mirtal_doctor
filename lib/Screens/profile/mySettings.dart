@@ -3,9 +3,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mirtal_doctor/Constants/colors.dart';
+import 'package:mirtal_doctor/Constants/myNavigator.dart';
 import 'package:mirtal_doctor/Constants/widthandheight.dart';
+import 'package:mirtal_doctor/Screens/profile/editPassword.dart';
+import 'package:mirtal_doctor/Screens/profile/editProfilePhoto.dart';
+import 'package:mirtal_doctor/Screens/profile/editWholeProfile.dart';
 import 'package:mirtal_doctor/Screens/profile/usercard.dart';
 import 'package:mirtal_doctor/data/ApiRequests.dart';
 import 'package:mirtal_doctor/models/doctorModel.dart';
@@ -53,51 +56,48 @@ class _MySettingsState extends State<MySettings> {
                   child: Stack(children: [
                     Center(
                         child: profilePhoto == null
-                            ? Image.network(
-                                doctorModel!.photo!,
-                                width: getwidth(context) * 0.4,
-                                height: getheight(context) * 0.1,
-                                fit: BoxFit.cover,
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(30.0),
+                                child: Image.network(
+                                  doctorModel!.photo!,
+                                  width: getwidth(context) * 0.4,
+                                  height: getheight(context) * 0.1,
+                                  fit: BoxFit.fill,
+                                ),
                               )
-                            : Image.file(
-                                profilePhoto!,
-                                width: getwidth(context) * 0.4,
-                                height: getheight(context) * 0.1,
-                                fit: BoxFit.cover,
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(30.0),
+                                child: Image.file(
+                                  profilePhoto!,
+                                  width: getwidth(context) * 0.4,
+                                  height: getheight(context) * 0.1,
+                                  fit: BoxFit.cover,
+                                ),
                               )),
-                    IconButton(
-                      icon: const Icon(Icons.camera_alt_outlined),
-                      onPressed: () async {
-                        final ImagePicker _profilePicker = ImagePicker();
-                        final XFile? image = await _profilePicker.pickImage(
-                            source: ImageSource.gallery);
+                    // IconButton(
+                    //   icon: const Icon(Icons.camera_alt_outlined),
+                    //   onPressed: () async {
+                    //     final ImagePicker _profilePicker = ImagePicker();
+                    //     final XFile? image = await _profilePicker.pickImage(
+                    //         source: ImageSource.gallery);
 
-                        setState(() {
-                          profilePhoto = File(image!.path);
-                        });
-                      },
-                    ),
+                    //     setState(() {
+                    //       profilePhoto = File(image!.path);
+                    //     });
+                    //   },
+                    // ),
                   ]),
                 ),
-                customSizedBox(0.0, 20.0),
+                customSizedBox(0.0, 10.0),
                 Center(
                     child: CustomTxt(
                   color: darkenAppColor,
                   fontWeight: FontWeight.bold,
                   title: doctorModel!.userName!,
-                  txtSize: 20,
+                  txtSize: 28,
                   ellipsis: false,
                 )),
-                InkWell(
-                  onTap: () {
-                    ApiRequests().updateProfilePhoto(profilePhoto!);
-                  },
-                  child: CustomButton(
-                      widht: getwidth(context) * 0.5,
-                      color: darkenAppColor,
-                      title: "Save"),
-                ),
-                customSizedBox(0.0, getheight(context) * 0.02),
+                //customSizedBox(0.0, getheight(context) * 0.02),
                 userCard(
                     context,
                     doctorModel!.title!,
@@ -107,7 +107,48 @@ class _MySettingsState extends State<MySettings> {
                     doctorModel!.location!,
                     doctorModel!.price!.toString(),
                     doctorModel!.gender!,
-                    doctorModel!.birthDate!)
+                    doctorModel!.birthDate!),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          MyNavigetor().push(
+                              EditProfilePhoto(doctorModel: doctorModel!),
+                              context);
+                        },
+                        child: CustomButton(
+                            widht: getwidth(context) * 0.4,
+                            color: appColor,
+                            title: "تعديل الصوره الشخصيه"),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          MyNavigetor().push(const EditPassword(), context);
+                        },
+                        child: CustomButton(
+                            widht: getwidth(context) * 0.4,
+                            color: appColor,
+                            title: "تعديل الباسورد"),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: InkWell(
+                    onTap: () {
+                      MyNavigetor().push(
+                          EditWholeProfile(doctorModel: doctorModel!), context);
+                    },
+                    child: CustomButton(
+                        widht: double.infinity,
+                        color: darkenAppColor,
+                        title: "تعديل البيانات الشخصيه"),
+                  ),
+                ),
               ],
             )),
     );

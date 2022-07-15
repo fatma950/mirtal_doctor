@@ -6,7 +6,7 @@ import 'package:mirtal_doctor/Constants/customSizedBox.dart';
 import 'package:mirtal_doctor/Constants/myNavigator.dart';
 import 'package:mirtal_doctor/Constants/widthandheight.dart';
 import 'package:mirtal_doctor/Screens/offlineClendar/addNewOfflineCalendar.dart';
-import 'package:mirtal_doctor/Screens/onlineClendar/addNewOnlineCalender.dart';
+import 'package:mirtal_doctor/Screens/offlineClendar/editOfflineCalender.dart';
 import 'package:mirtal_doctor/models/doctorModel.dart';
 import 'package:mirtal_doctor/sharedWidgets/customButton.dart';
 
@@ -41,7 +41,7 @@ class _OfflineDayReservationCardState extends State<OfflineDayReservationCard> {
             ? Center(
                 child: InkWell(
                   onTap: () {
-                    MyNavigetor().push(const AddNewOnlineCalender(), context);
+                    MyNavigetor().push(const AddNewOfflineCalender(), context);
                   },
                   child: CustomButton(
                       widht: getwidth(context) * 0.5,
@@ -56,7 +56,7 @@ class _OfflineDayReservationCardState extends State<OfflineDayReservationCard> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
-                        childAspectRatio: 2 / 3.05,
+                        childAspectRatio: 2 / 3.8,
                         crossAxisSpacing: 1,
                         mainAxisSpacing: 1,
                       ),
@@ -121,8 +121,34 @@ class _OfflineDayReservationCardState extends State<OfflineDayReservationCard> {
                                 ),
                                 customSizedBox(0.0, 15.0),
                                 InkWell(
-                                  onTap: () {
-                                    // print(doctorModel!.calender![index].sId);
+                                  onTap: () async {
+                                    MyNavigetor().push(
+                                        EditOfflineCalender(
+                                            calender:
+                                                doctorModel!.calender![index]),
+                                        context);
+                                  },
+                                  child: Container(
+                                    height: 30,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      color: Colors.green,
+                                    ),
+                                    child: Text("تعديل هذا الميعاد",
+                                        style: TextStyle(
+                                            color: myWhite,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                                customSizedBox(0.0, 15.0),
+                                InkWell(
+                                  onTap: () async {
+                                    //print(doctorModel!.calender![index].sId);
+                                    await ApiRequests().deleteCalender(
+                                        context,
+                                        doctorModel!.calender![index].sId!
+                                            .toString());
                                   },
                                   child: Container(
                                     height: 30,

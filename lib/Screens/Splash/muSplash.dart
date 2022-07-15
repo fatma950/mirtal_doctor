@@ -42,11 +42,6 @@ class _MySplashState extends State<MySplash> {
                             Image.asset(
                               'assets/Capture2.JPG',
                               height: getwidth(context) / 2,
-
-                              //color: appColor1,
-                            ),
-                            const SizedBox(
-                              height: 10,
                             ),
                           ],
                         )))),

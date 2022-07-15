@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mirtal_doctor/data/ApiRequests.dart';
 
 import '../../Constants/colors.dart';
@@ -22,6 +23,9 @@ class _AddNewOnlineCalenderState extends State<AddNewOnlineCalender> {
   TextEditingController from = TextEditingController();
   TextEditingController to = TextEditingController();
   String? _weekDaySelection;
+  String onlineCalendarDateInString = "";
+  DateTime onlineCalendarDate = DateTime.now();
+  bool isDateSelected = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,6 +81,52 @@ class _AddNewOnlineCalenderState extends State<AddNewOnlineCalender> {
             ),
           ),
           customSizedBox(0.0, 20.0),
+          GestureDetector(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: myGrey),
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: myWhite),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        CustomTxt(
+                            title: onlineCalendarDateInString == ""
+                                ? DateFormat("yyyy-MM-dd")
+                                    .format(DateTime.now())
+                                : onlineCalendarDateInString,
+                            txtSize: 15.0,
+                            fontWeight: FontWeight.bold,
+                            color: myBlack,
+                            ellipsis: false),
+                        Icon(
+                          Icons.calendar_month,
+                          color: darkenAppColor,
+                        ),
+                      ],
+                    )),
+              ),
+              onTap: () async {
+                final datePick = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2100));
+                if (datePick != null && datePick != onlineCalendarDate) {
+                  setState(() {
+                    onlineCalendarDate = datePick;
+                    isDateSelected = true;
+
+                    onlineCalendarDateInString =
+                        "${onlineCalendarDate.month}-${onlineCalendarDate.day}-${onlineCalendarDate.year}";
+                  });
+                }
+              }),
+          customSizedBox(0.0, 20.0),
           CustomTextField(
             hint: "من",
             isPassword: false,
@@ -96,8 +146,12 @@ class _AddNewOnlineCalenderState extends State<AddNewOnlineCalender> {
           Center(
               child: InkWell(
             onTap: () {
-              ApiRequests().addOnlineCalender(_weekDaySelection!,
-                  from.text.toString(), to.text.toString(), context);
+              ApiRequests().addOnlineCalender(
+                  _weekDaySelection!,
+                  onlineCalendarDateInString,
+                  from.text.toString(),
+                  to.text.toString(),
+                  context);
             },
             child: CustomButton(
                 widht: MediaQuery.of(context).size.width * 0.9,

@@ -24,3 +24,14 @@ void showFailedToast(String msg) {
       textColor: Colors.white,
       fontSize: 16.0);
 }
+
+void showThiredToast(String msg) {
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.orange,
+      textColor: Colors.white,
+      fontSize: 16.0);
+}

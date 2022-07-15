@@ -2,52 +2,55 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mirtal_doctor/Constants/customToast.dart';
-import 'package:mirtal_doctor/data/ApiRequests.dart';
-import 'package:mirtal_doctor/data/weekDays.dart';
+
+import 'package:mirtal_doctor/Constants/widthandheight.dart';
+import 'package:mirtal_doctor/models/doctorModel.dart';
 
 import '../../Constants/colors.dart';
 import '../../Constants/customSizedBox.dart';
+import '../../data/ApiRequests.dart';
+import '../../data/weekDays.dart';
 import '../../sharedWidgets/customButton.dart';
 import '../../sharedWidgets/customText.dart';
 import '../../sharedWidgets/customTextField.dart';
-import '../Auth/defaultAuthAppbar.dart';
 
-class AddNewOfflineCalender extends StatefulWidget {
-  const AddNewOfflineCalender({Key? key}) : super(key: key);
+class EditOfflineCalender extends StatefulWidget {
+  final Calender calender;
+  const EditOfflineCalender({
+    Key? key,
+    required this.calender,
+  }) : super(key: key);
 
   @override
-  State<AddNewOfflineCalender> createState() => _AddNewOfflineCalenderState();
+  State<EditOfflineCalender> createState() => _EditOfflineCalenderState();
 }
 
-class _AddNewOfflineCalenderState extends State<AddNewOfflineCalender> {
+class _EditOfflineCalenderState extends State<EditOfflineCalender> {
   TextEditingController from = TextEditingController();
   TextEditingController to = TextEditingController();
   String? _weekDaySelection;
-
-  String offlineCalendarDateInString = "";
-  DateTime offlineCalendarDate = DateTime.now();
+  String onlineCalendarDateInString = "";
+  DateTime onlineCalendarDate = DateTime.now();
   bool isDateSelected = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: myWhite,
+        leading: BackButton(color: darkenAppColor),
+        title: CustomTxt(
+            color: darkenAppColor,
+            ellipsis: false,
+            fontWeight: FontWeight.bold,
+            title: "تعديل الميعاد",
+            txtSize: 20),
+      ),
       body: SingleChildScrollView(
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const DefaultAuthAppBar(),
-          customSizedBox(0.0, 15.0),
-          Padding(
-            padding: const EdgeInsets.only(right: 15.0),
-            child: CustomTxt(
-                title: "أضافه معاد جديد",
-                txtSize: 20,
-                fontWeight: FontWeight.bold,
-                color: darkenAppColor,
-                ellipsis: false),
-          ),
-          customSizedBox(0.0, 20.0),
+          customSizedBox(0.0, getheight(context) * 0.1),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
@@ -98,10 +101,10 @@ class _AddNewOfflineCalenderState extends State<AddNewOfflineCalender> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         CustomTxt(
-                            title: offlineCalendarDateInString == ""
+                            title: onlineCalendarDateInString == ""
                                 ? DateFormat("yyyy-MM-dd")
                                     .format(DateTime.now())
-                                : offlineCalendarDateInString,
+                                : onlineCalendarDateInString,
                             txtSize: 15.0,
                             fontWeight: FontWeight.bold,
                             color: myBlack,
@@ -119,13 +122,13 @@ class _AddNewOfflineCalenderState extends State<AddNewOfflineCalender> {
                     initialDate: DateTime.now(),
                     firstDate: DateTime(1900),
                     lastDate: DateTime(2100));
-                if (datePick != null && datePick != offlineCalendarDate) {
+                if (datePick != null && datePick != onlineCalendarDate) {
                   setState(() {
-                    offlineCalendarDate = datePick;
+                    onlineCalendarDate = datePick;
                     isDateSelected = true;
 
-                    offlineCalendarDateInString =
-                        "${offlineCalendarDate.month}-${offlineCalendarDate.day}-${offlineCalendarDate.year}";
+                    onlineCalendarDateInString =
+                        "${onlineCalendarDate.month}-${onlineCalendarDate.day}-${onlineCalendarDate.year}";
                   });
                 }
               }),
@@ -139,8 +142,8 @@ class _AddNewOfflineCalenderState extends State<AddNewOfflineCalender> {
           ),
           customSizedBox(0.0, 20.0),
           CustomTextField(
-            hint: "الى",
             isPassword: false,
+            hint: "الى",
             textEditingController: to,
             keyboardType: TextInputType.emailAddress,
             icon: Icons.timelapse,
@@ -149,29 +152,26 @@ class _AddNewOfflineCalenderState extends State<AddNewOfflineCalender> {
           Center(
               child: InkWell(
             onTap: () {
-              if (_weekDaySelection == null) {
-                showFailedToast("من فضلك قم بادخال الساعه");
-                return;
-              }
-              if (from.text.isEmpty) {
-                showFailedToast("من فضلك قم بتحديد بدايه المعاد");
-                return;
-              }
-              if (to.text.isEmpty) {
-                showFailedToast("من فضلك قم بتحديد نهايه المعاد");
-                return;
-              }
-              ApiRequests().addOfflineCalender(
-                  _weekDaySelection!,
-                  offlineCalendarDateInString,
-                  from.text.toString(),
-                  to.text.toString(),
-                  context);
+              ApiRequests().editCalender(
+                  context,
+                  widget.calender.sId!,
+                  _weekDaySelection == null
+                      ? widget.calender.weekday!
+                      : _weekDaySelection!,
+                  onlineCalendarDateInString.isEmpty
+                      ? DateFormat("yyyy-MM-dd").format(DateTime.now())
+                      : onlineCalendarDateInString,
+                  from.text.isEmpty
+                      ? widget.calender.startAt!
+                      : from.text.toString(),
+                  to.text.isEmpty
+                      ? widget.calender.endAt!
+                      : to.text.toString());
             },
             child: CustomButton(
                 widht: MediaQuery.of(context).size.width * 0.9,
                 color: darkenAppColor,
-                title: "ارسال"),
+                title: "تعديل"),
           )),
         ],
       )),

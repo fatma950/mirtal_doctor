@@ -3,12 +3,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:mirtal_doctor/Constants/colors.dart';
 import 'package:mirtal_doctor/Constants/strings.dart';
 import 'package:mirtal_doctor/Screens/Auth/defaultAuthAppbar.dart';
 import 'package:mirtal_doctor/data/ApiRequests.dart';
+import 'package:mirtal_doctor/data/cities.dart';
+import 'package:mirtal_doctor/data/regions.dart';
+import 'package:mirtal_doctor/data/specialities.dart';
 import '../../Constants/customSizedBox.dart';
 import '../../Constants/widthandheight.dart';
 import '../../sharedWidgets/customButton.dart';
@@ -17,8 +20,6 @@ import '../../sharedWidgets/customTextField.dart';
 import '../../sharedWidgets/responsiveWidget.dart';
 import 'authCommen.dart';
 import 'login.dart';
-import 'package:gender_picker/source/enums.dart';
-import 'package:gender_picker/source/gender_picker.dart';
 
 class Registration extends StatefulWidget {
   const Registration({Key? key}) : super(key: key);
@@ -34,11 +35,10 @@ class _RegistrationState extends State<Registration> {
   TextEditingController confirmController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController locationController = TextEditingController();
-  TextEditingController cityController = TextEditingController();
-  TextEditingController regionController = TextEditingController();
+
   TextEditingController addressController = TextEditingController();
   TextEditingController priceController = TextEditingController();
-  TextEditingController specialityController = TextEditingController();
+
   TextEditingController specialityDescriptionController =
       TextEditingController();
 
@@ -49,7 +49,10 @@ class _RegistrationState extends State<Registration> {
   File? profileImage;
   File? licenceImage;
 
-  String genderTxt = "";
+  String? genderTxt;
+  String? city;
+  String? speciality;
+  String? region;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +134,8 @@ class _RegistrationState extends State<Registration> {
                         children: [
                           CustomTxt(
                               title: birthDateInString == ""
-                                  ? DateTime.now().toString()
+                                  ? DateFormat("yyyy-MM-dd")
+                                      .format(DateTime.now())
                                   : birthDateInString,
                               txtSize: 15.0,
                               fontWeight: FontWeight.bold,
@@ -161,26 +165,42 @@ class _RegistrationState extends State<Registration> {
                   }
                 }),
             customSizedBox(0.0, 10.0),
-            GenderPickerWithImage(
-              showOtherGender: true,
-              verticalAlignedText: false,
-              selectedGender: Gender.Male,
-              selectedGenderTextStyle:
-                  TextStyle(color: darkenAppColor, fontWeight: FontWeight.bold),
-              unSelectedGenderTextStyle:
-                  TextStyle(color: myWhite, fontWeight: FontWeight.normal),
-              onChanged: (gender) {
-                setState(() {
-                  genderTxt = gender.toString();
-                });
-              },
-              equallyAligned: true,
-              animationDuration: const Duration(milliseconds: 300),
-              isCircular: true,
-              // default : true,
-              opacityOfGradient: 0.4,
-              padding: const EdgeInsets.all(3),
-              size: 50, //default : 40
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(right: 10, left: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: DropdownButton<String>(
+                  underline: Container(),
+                  style: TextStyle(
+                      color: darkenAppColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
+                  hint: const Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Text("من فضلك اختر النوع",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.normal)),
+                  ),
+                  isExpanded: true,
+                  items: ["male", "female"].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  value: genderTxt,
+                  onChanged: (newValue) {
+                    setState(() {
+                      genderTxt = newValue;
+                    });
+                  },
+                ),
+              ),
             ),
             customSizedBox(0.0, 10.0),
             CustomTextField(
@@ -191,28 +211,118 @@ class _RegistrationState extends State<Registration> {
               isPassword: false,
             ),
             customSizedBox(0.0, 10.0),
-            CustomTextField(
-              hint: "المنطقه",
-              textEditingController: regionController,
-              keyboardType: TextInputType.name,
-              icon: Icons.location_on_outlined,
-              isPassword: false,
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(right: 10, left: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: DropdownButton<String>(
+                  underline: Container(),
+                  style: TextStyle(
+                      color: darkenAppColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
+                  hint: const Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Text("من فضلك اختر المنطقه",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.normal)),
+                  ),
+                  isExpanded: true,
+                  items: regions.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  value: region,
+                  onChanged: (newValue) {
+                    setState(() {
+                      region = newValue;
+                    });
+                  },
+                ),
+              ),
             ),
             customSizedBox(0.0, 10.0),
-            CustomTextField(
-              hint: "عنوان العياده",
-              textEditingController: addressController,
-              keyboardType: TextInputType.name,
-              icon: Icons.location_city,
-              isPassword: false,
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(right: 10, left: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: DropdownButton<String>(
+                  underline: Container(),
+                  style: TextStyle(
+                      color: darkenAppColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
+                  hint: const Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Text("من فضلك اختر العنوان",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.normal)),
+                  ),
+                  isExpanded: true,
+                  items: cities.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  value: city,
+                  onChanged: (newValue) {
+                    setState(() {
+                      city = newValue;
+                    });
+                  },
+                ),
+              ),
             ),
             customSizedBox(0.0, 10.0),
-            CustomTextField(
-              hint: "التخصص",
-              textEditingController: specialityController,
-              keyboardType: TextInputType.name,
-              icon: Icons.swipe_vertical,
-              isPassword: false,
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(right: 10, left: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: DropdownButton<String>(
+                  underline: Container(),
+                  style: TextStyle(
+                      color: darkenAppColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
+                  hint: const Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Text("من فضلك اختر التخصص",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.normal)),
+                  ),
+                  isExpanded: true,
+                  items: specialities.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  value: speciality,
+                  onChanged: (newValue) {
+                    setState(() {
+                      speciality = newValue;
+                    });
+                  },
+                ),
+              ),
             ),
             customSizedBox(0.0, 10.0),
             CustomTextField(
@@ -234,95 +344,110 @@ class _RegistrationState extends State<Registration> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Stack(children: [
-                  Center(
-                      child: profileImage == null
-                          ? Image.network(
-                              imagePlaceHolder,
-                              width: getwidth(context) * 0.4,
-                              height: getheight(context) * 0.1,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              profileImage!,
-                              width: getwidth(context) * 0.4,
-                              height: getheight(context) * 0.1,
-                              fit: BoxFit.cover,
-                            )),
-                  Positioned(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      alignment: Alignment.topRight,
-                      child: IconButton(
-                          onPressed: () async {
-                            final ImagePicker _profilePicker = ImagePicker();
-                            final XFile? image = await _profilePicker.pickImage(
-                              source: ImageSource.gallery,
-                            );
+                SizedBox(
+                    width: getwidth(context) * 0.4,
+                    child: Column(
+                      children: [
+                        Stack(children: [
+                          Center(
+                              child: profileImage == null
+                                  ? Image.asset(
+                                      imagePlaceHolder,
+                                      width: getwidth(context) * 0.3,
+                                      height: getheight(context) * 0.1,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      profileImage!,
+                                      width: getwidth(context) * 0.3,
+                                      height: getheight(context) * 0.1,
+                                      fit: BoxFit.cover,
+                                    )),
+                          Positioned(
+                              child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 20),
+                            alignment: Alignment.center,
+                            child: InkWell(
+                                onTap: () async {
+                                  final ImagePicker _profilePicker =
+                                      ImagePicker();
+                                  final XFile? image =
+                                      await _profilePicker.pickImage(
+                                    source: ImageSource.gallery,
+                                  );
 
-                            setState(() {
-                              profileImage = File(image!.path);
-                            });
-                          },
-                          icon: const Icon(
-                            FontAwesomeIcons.camera,
-                            size: 30,
-                            color: Colors.white,
-                          )),
-                    ),
-                  ),
-                  Positioned(
-                    child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 50),
-                        alignment: Alignment.bottomCenter,
-                        child: const Text("اختر صورة البروفايل")),
-                  )
-                ]),
-                Stack(children: [
-                  Center(
-                      child: licenceImage == null
-                          ? Image.network(
-                              imagePlaceHolder,
-                              width: getwidth(context) * 0.4,
-                              height: getheight(context) * 0.1,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              licenceImage!,
-                              width: getwidth(context) * 0.4,
-                              height: getheight(context) * 0.1,
-                              fit: BoxFit.cover,
-                            )),
-                  Positioned(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      alignment: Alignment.topRight,
-                      child: IconButton(
-                          onPressed: () async {
-                            final ImagePicker licencePicker = ImagePicker();
+                                  setState(() {
+                                    profileImage = File(image!.path);
+                                  });
+                                },
+                                child: Image.asset(imagePlaceHolderIcon,
+                                    width: 50, height: 50)),
+                          ))
+                        ]),
+                        customSizedBox(0.0, 10.0),
+                        Center(
+                            child: CustomTxt(
+                                title: "اختر صورة البروفايل",
+                                txtSize: 15.0,
+                                fontWeight: FontWeight.bold,
+                                color: darkenAppColor,
+                                ellipsis: false))
+                      ],
+                    )),
+                SizedBox(
+                    width: getwidth(context) * 0.4,
+                    child: Column(
+                      children: [
+                        Stack(children: [
+                          Center(
+                              child: licenceImage == null
+                                  ? Image.asset(
+                                      imagePlaceHolder,
+                                      width: getwidth(context) * 0.3,
+                                      height: getheight(context) * 0.1,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      licenceImage!,
+                                      width: getwidth(context) * 0.3,
+                                      height: getheight(context) * 0.1,
+                                      fit: BoxFit.cover,
+                                    )),
+                          Positioned(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 20),
+                              alignment: Alignment.center,
+                              child: InkWell(
+                                  onTap: () async {
+                                    final ImagePicker licencePicker =
+                                        ImagePicker();
 
-                            final XFile? image = await licencePicker.pickImage(
-                              source: ImageSource.gallery,
-                            );
+                                    final XFile? image =
+                                        await licencePicker.pickImage(
+                                      source: ImageSource.gallery,
+                                    );
 
-                            setState(() {
-                              licenceImage = File(image!.path);
-                            });
-                          },
-                          icon: const Icon(
-                            FontAwesomeIcons.camera,
-                            size: 30,
-                            color: Colors.white,
-                          )),
-                    ),
-                  ),
-                  Positioned(
-                    child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 50),
-                        alignment: Alignment.bottomCenter,
-                        child: const Text("اختر صورة الرخصة")),
-                  )
-                ]),
+                                    setState(() {
+                                      licenceImage = File(image!.path);
+                                    });
+                                  },
+                                  child: Image.asset(imagePlaceHolderIcon,
+                                      width: 50, height: 50)),
+                            ),
+                          ),
+                        ]),
+                        customSizedBox(0.0, 10.0),
+                        Center(
+                            child: CustomTxt(
+                                title: "اختر صورة الرخصه",
+                                txtSize: 15.0,
+                                fontWeight: FontWeight.bold,
+                                color: darkenAppColor,
+                                ellipsis: false))
+                      ],
+                    ))
               ],
             ),
             customSizedBox(0.0, 20.0),
@@ -336,14 +461,14 @@ class _RegistrationState extends State<Registration> {
                       confirmController.text.toString(),
                       phoneController.text.toString(),
                       nameController.text.toString(),
-                      cityController.text.toString(),
+                      city!,
                       birthDateInString,
                       priceController.text.toString(),
                       specialityDescriptionController.text.toString(),
-                      specialityController.text.toString(),
+                      speciality!,
                       locationController.text.toString(),
-                      genderTxt,
-                      regionController.text.toString(),
+                      genderTxt!,
+                      region!,
                       licenceImage!,
                       profileImage!);
                 });

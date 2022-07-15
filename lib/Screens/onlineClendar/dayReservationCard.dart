@@ -7,6 +7,7 @@ import 'package:mirtal_doctor/Constants/customSizedBox.dart';
 import 'package:mirtal_doctor/Constants/myNavigator.dart';
 import 'package:mirtal_doctor/Constants/widthandheight.dart';
 import 'package:mirtal_doctor/Screens/onlineClendar/addNewOnlineCalender.dart';
+import 'package:mirtal_doctor/Screens/onlineClendar/editCalender.dart';
 import 'package:mirtal_doctor/models/doctorModel.dart';
 import 'package:mirtal_doctor/sharedWidgets/customButton.dart';
 
@@ -55,7 +56,7 @@ class _DayReservationCardState extends State<DayReservationCard> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
-                        childAspectRatio: 2 / 3.05,
+                        childAspectRatio: 2 / 3.8,
                         crossAxisSpacing: 1,
                         mainAxisSpacing: 1,
                       ),
@@ -120,20 +121,52 @@ class _DayReservationCardState extends State<DayReservationCard> {
                                       style: TextStyle(color: myWhite)),
                                 ),
                                 customSizedBox(0.0, 15.0),
-                                Container(
-                                  height: 30,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    color: Colors.red,
+                                InkWell(
+                                  onTap: () async {
+                                    MyNavigetor().push(
+                                        EditCalender(
+                                            calender: doctorModel!
+                                                .teleCalender![index]),
+                                        context);
+                                  },
+                                  child: Container(
+                                    height: 30,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      color: Colors.green,
+                                    ),
+                                    child: Text(
+                                      "تعديل هذا الميعاد",
+                                      style: TextStyle(
+                                          color: myWhite,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                                  child: Text(
-                                    "حذف هذا الميعاد",
-                                    style: TextStyle(
-                                        color: myWhite,
-                                        fontWeight: FontWeight.bold),
+                                ),
+                                customSizedBox(0.0, 15.0),
+                                InkWell(
+                                  onTap: () async {
+                                    await ApiRequests().deleteCalender(
+                                        context,
+                                        doctorModel!.teleCalender![index].sId!
+                                            .toString());
+                                  },
+                                  child: Container(
+                                    height: 30,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      color: Colors.red,
+                                    ),
+                                    child: Text(
+                                      "حذف هذا الميعاد",
+                                      style: TextStyle(
+                                          color: myWhite,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                                )
+                                ),
                               ]),
                         );
                       },

@@ -99,11 +99,11 @@ class _LoginPageState extends State<LoginPage> {
                   });
                 },
                 child: CustomButton(
-                    widht: MediaQuery.of(context).size.width * 0.9,
+                    widht: getwidth(context) * 0.9,
                     color: darkenAppColor,
                     title: "دخول"),
               )),
-              customSizedBox(0.0, getheight(context) * 0.4),
+              customSizedBox(0.0, getheight(context) * 0.2),
               authTextRow(context, "ليس لديك حساب ؟", "تسجيل الدخول ",
                   const Registration()),
             ],
