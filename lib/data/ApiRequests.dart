@@ -8,6 +8,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mirtal_doctor/Constants/customToast.dart';
 import 'package:mirtal_doctor/Constants/myNavigator.dart';
 import 'package:mirtal_doctor/Screens/bottomNavigation/bottomBar.dart';
+import 'package:mirtal_doctor/models/AllDayReservationsModel.dart';
 import 'package:mirtal_doctor/models/commentsModel.dart';
 import 'package:mirtal_doctor/models/doctorModel.dart';
 import 'package:mirtal_doctor/models/postsModel.dart';
@@ -19,10 +20,25 @@ import '../Screens/Auth/login.dart';
 class ApiRequests {
   loginDoctor(String mail, String password, BuildContext context) async {
     showLoading(context);
+
     final prefs = await SharedPreferences.getInstance();
+    //prefs.setString("test", "value");
     var headers = {'Content-Type': 'application/json'};
+
+    /*
+      POST
+        PUT
+        DELETE
+        REMOVET => save data in server
+      GET => get data from server
+    */
+
+    // var response =  http.post(Uri.parse("dd") , body: ,headers: );
+    //result =  response.send;
+
     var request = http.Request(
         'POST', Uri.parse('https://mitral.herokuapp.com/auth/loginDoctor'));
+
     request.body = json.encode({"email": mail, "password": password});
     request.headers.addAll(headers);
 
@@ -30,18 +46,19 @@ class ApiRequests {
 
     hideLoading(context);
 
+    var myResponse = await json.decode(await response.stream.bytesToString());
+
     if (response.statusCode == 200) {
-      var myResponse = await json.decode(await response.stream.bytesToString());
       if (myResponse['message'] == "تسجيل الدخول بنجاح") {
         prefs.setString("doctorID", myResponse["userId"]);
         prefs.setString("doctorToken", myResponse["token"]);
-        hideLoading(context);
+        // hideLoading(context);
         MyNavigetor().push(const BottomBar(), context);
       } else {
         showFailedToast(myResponse['message']);
       }
     } else {
-      showFailedToast("لقد حدث خطأ");
+      showFailedToast(myResponse['message'].toString());
     }
   }
 
@@ -63,9 +80,11 @@ class ApiRequests {
       File licenceImg,
       File profileImg) async {
     showLoading(context);
+
     var headers = {
       'Content-Type': 'multipart/form-data',
     };
+
     var request = http.MultipartRequest(
         'POST', Uri.parse('https://mitral.herokuapp.com/auth/signupDoctor'));
 
@@ -391,6 +410,35 @@ class ApiRequests {
       reservationModel = ReservationModel.fromJson(json.decode(result));
 
       return reservationModel;
+    } else {
+      showFailedToast(response.reasonPhrase.toString());
+    }
+  }
+
+  gelAllDayReservations(String serachedDay) async {
+    AllDayReservationsModel? allDayReservations;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    String? token = prefs.getString("doctorToken");
+
+    var headers = {'token': '$token', 'Content-Type': 'application/json'};
+    var request = http.Request('GET',
+        Uri.parse('https://mitral.herokuapp.com/doctor/getResrvationDay'));
+    request.body = json.encode({"time": serachedDay});
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    //print(await response.stream.bytesToString());
+
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+
+      allDayReservations =
+          AllDayReservationsModel.fromJson(json.decode(result));
+
+      return allDayReservations;
     } else {
       showFailedToast(response.reasonPhrase.toString());
     }

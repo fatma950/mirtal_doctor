@@ -6,5 +6,9 @@ class MyNavigetor {
   push(screenName, BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => screenName));
+
+    //Navigator.pushReplacement(context, newRoute);
+
+    //Navigator.pushNamed(context, routeName);
   }
 }

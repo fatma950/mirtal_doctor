@@ -122,7 +122,7 @@ class _AddNewOnlineCalenderState extends State<AddNewOnlineCalender> {
                     isDateSelected = true;
 
                     onlineCalendarDateInString =
-                        "${onlineCalendarDate.month}-${onlineCalendarDate.day}-${onlineCalendarDate.year}";
+                        "${onlineCalendarDate.day}-${onlineCalendarDate.month}-${onlineCalendarDate.year}";
                   });
                 }
               }),

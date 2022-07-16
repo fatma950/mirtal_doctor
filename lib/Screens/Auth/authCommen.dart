@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mirtal_doctor/Constants/colors.dart';
+import 'package:mirtal_doctor/Constants/myNavigator.dart';
 import 'package:mirtal_doctor/Screens/Auth/passwordRecoveyEmail.dart';
 
 import '../../Constants/customSizedBox.dart';
@@ -30,8 +31,7 @@ authTextRow(
         customSizedBox(5.0, 0.0),
         GestureDetector(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => navigateRoute));
+            MyNavigetor().push(navigateRoute, context);
           },
           child: Text(
             action,
@@ -53,7 +53,7 @@ Widget forgetPassTextRow(BuildContext context) {
   bool _large = ResponsiveWidget.isScreenLarge(_width, _pixelRatio);
   bool _medium = ResponsiveWidget.isScreenMedium(_width, _pixelRatio);
   return Container(
-    margin: EdgeInsets.only(top: _height / 40.0),
+    margin: EdgeInsets.only(top: _height / 3040.0),
     padding: const EdgeInsets.only(right: 15.0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -67,10 +67,7 @@ Widget forgetPassTextRow(BuildContext context) {
         customSizedBox(5.0, 0.0),
         GestureDetector(
           onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const PasswordRecover()));
+            MyNavigetor().push(const PasswordRecover(), context);
           },
           child: CustomTxt(
             color: darkenAppColor,
