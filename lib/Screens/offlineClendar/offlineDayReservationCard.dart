@@ -56,7 +56,7 @@ class _OfflineDayReservationCardState extends State<OfflineDayReservationCard> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
-                        childAspectRatio: 2 / 3.8,
+                        childAspectRatio: 2 / 4.0,
                         crossAxisSpacing: 1,
                         mainAxisSpacing: 1,
                       ),

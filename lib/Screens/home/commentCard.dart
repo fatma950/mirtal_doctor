@@ -42,29 +42,31 @@ class MyComment extends StatelessWidget {
             ),
           ),
           customSizedBox(10.0, 0.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomTxt(
-                  title: doctorName + " ($speciality)",
-                  txtSize: 15.0,
-                  fontWeight: FontWeight.bold,
-                  color: darkenAppColor,
-                  ellipsis: false),
-              CustomTxt(
-                  title: time,
-                  txtSize: 12,
-                  fontWeight: FontWeight.normal,
-                  color: myGrey,
-                  ellipsis: false),
-              customSizedBox(0.0, 10.0),
-              CustomTxt(
-                  title: comment,
-                  txtSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: myBlack,
-                  ellipsis: false),
-            ],
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTxt(
+                    title: doctorName + " ($speciality)",
+                    txtSize: 15.0,
+                    fontWeight: FontWeight.bold,
+                    color: darkenAppColor,
+                    ellipsis: false),
+                CustomTxt(
+                    title: time,
+                    txtSize: 12,
+                    fontWeight: FontWeight.normal,
+                    color: myGrey,
+                    ellipsis: false),
+                customSizedBox(0.0, 10.0),
+                CustomTxt(
+                    title: comment,
+                    txtSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: myBlack,
+                    ellipsis: true),
+              ],
+            ),
           )
         ],
       ),
