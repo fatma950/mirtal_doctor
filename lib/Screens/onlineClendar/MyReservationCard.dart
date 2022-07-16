@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:mirtal_doctor/Constants/colors.dart';
 import 'package:mirtal_doctor/Constants/customSizedBox.dart';
+import 'package:mirtal_doctor/Constants/myNavigator.dart';
+import 'package:mirtal_doctor/Screens/onlineClendar/AllDayReservations.dart';
 import 'package:mirtal_doctor/data/ApiRequests.dart';
 import 'package:mirtal_doctor/models/reservationModel.dart';
 import 'package:mirtal_doctor/sharedWidgets/customButton.dart';
@@ -19,6 +21,10 @@ class MyReservation extends StatefulWidget {
 class _MyReservationState extends State<MyReservation> {
   bool loading = true;
   ReservationModel? reservationModel;
+
+  String searchedDayInString = "";
+  DateTime searchedDay = DateTime.now();
+  bool isDateSelected = false;
 
   @override
   void initState() {
@@ -43,6 +49,65 @@ class _MyReservationState extends State<MyReservation> {
                   color: darkenAppColor,
                   ellipsis: false),
             ),
+            customSizedBox(0.0, 20.0),
+            GestureDetector(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                      height: 50,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: myGrey),
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: myWhite),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          CustomTxt(
+                              title: searchedDayInString == ""
+                                  ? "يمكنك اختيار يوم معين لعرض الحجوزات الخاصه به من هنا"
+                                  : "اليوم المختار : " + searchedDayInString,
+                              txtSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                              color: myBlack,
+                              ellipsis: false),
+                          Icon(
+                            Icons.calendar_month,
+                            color: darkenAppColor,
+                          ),
+                        ],
+                      )),
+                ),
+                onTap: () async {
+                  final datePick = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2100));
+                  if (datePick != null && datePick != searchedDay) {
+                    setState(() {
+                      searchedDay = datePick;
+                      isDateSelected = true;
+
+                      searchedDayInString =
+                          "${searchedDay.year}-${searchedDay.month}-${searchedDay.day}";
+                    });
+                  }
+                }),
+            customSizedBox(0.0, 10.0),
+            InkWell(
+              onTap: () {
+                MyNavigetor().push(
+                    AllDayReservations(searchedDay: searchedDayInString),
+                    context);
+              },
+              child: CustomButton(
+                color: darkenAppColor,
+                title: "ابدأ عرض الحجوزات الخاصه باليوم المختار",
+                widht: double.infinity,
+              ),
+            ),
+            customSizedBox(0.0, 20.0),
             loading
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
@@ -181,16 +246,6 @@ class _MyReservationState extends State<MyReservation> {
                                               .meeting!))) {
                                         throw 'Could not launch';
                                       }
-
-                                      // if (await canLaunch(reservationModel!
-                                      //     .getAllReservation![index]
-                                      //     .meeting!)) {
-                                      //   await launch(reservationModel!
-                                      //       .getAllReservation![index]
-                                      //       .meeting!);
-                                      // } else {
-                                      //   throw 'Could not launch';
-                                      // }
                                     },
                                     child: CustomButton(
                                         widht: double.infinity,
@@ -210,7 +265,6 @@ class _MyReservationState extends State<MyReservation> {
 
   getAllReservations() async {
     reservationModel = await ApiRequests().getAllReservations();
-    //print(reservationModel!.getAllReservation!.length);
     setState(() {
       loading = false;
     });

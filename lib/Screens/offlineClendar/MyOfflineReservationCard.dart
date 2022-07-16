@@ -2,11 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:mirtal_doctor/Constants/colors.dart';
+import 'package:mirtal_doctor/Screens/offlineClendar/AllDayReservations.dart';
 import 'package:mirtal_doctor/sharedWidgets/customText.dart';
 
 import '../../Constants/customSizedBox.dart';
+import '../../Constants/myNavigator.dart';
 import '../../data/ApiRequests.dart';
 import '../../models/reservationModel.dart';
+import '../../sharedWidgets/customButton.dart';
 
 class MyOfflineReservation extends StatefulWidget {
   const MyOfflineReservation({Key? key}) : super(key: key);
@@ -18,6 +21,10 @@ class MyOfflineReservation extends StatefulWidget {
 class _MyOfflineReservationState extends State<MyOfflineReservation> {
   bool loading = true;
   ReservationModel? reservationModel;
+
+  String searchedDayInString = "";
+  DateTime searchedDay = DateTime.now();
+  bool isDateSelected = false;
 
   @override
   void initState() {
@@ -42,6 +49,65 @@ class _MyOfflineReservationState extends State<MyOfflineReservation> {
                   color: darkenAppColor,
                   ellipsis: false),
             ),
+            customSizedBox(0.0, 20.0),
+            GestureDetector(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                      height: 50,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: myGrey),
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: myWhite),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          CustomTxt(
+                              title: searchedDayInString == ""
+                                  ? "يمكنك اختيار يوم معين لعرض الحجوزات الخاصه به من هنا"
+                                  : "اليوم المختار : " + searchedDayInString,
+                              txtSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                              color: myBlack,
+                              ellipsis: false),
+                          Icon(
+                            Icons.calendar_month,
+                            color: darkenAppColor,
+                          ),
+                        ],
+                      )),
+                ),
+                onTap: () async {
+                  final datePick = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2100));
+                  if (datePick != null && datePick != searchedDay) {
+                    setState(() {
+                      searchedDay = datePick;
+                      isDateSelected = true;
+
+                      searchedDayInString =
+                          "${searchedDay.year}-${searchedDay.month}-${searchedDay.day}";
+                    });
+                  }
+                }),
+            customSizedBox(0.0, 10.0),
+            InkWell(
+              onTap: () {
+                MyNavigetor().push(
+                    OfflineAllDayReservations(searchedDay: searchedDayInString),
+                    context);
+              },
+              child: CustomButton(
+                color: darkenAppColor,
+                title: "ابدأ عرض الحجوزات الخاصه باليوم المختار",
+                widht: double.infinity,
+              ),
+            ),
+            customSizedBox(0.0, 20.0),
             loading
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(

@@ -160,7 +160,7 @@ class _RegistrationState extends State<Registration> {
                       isDateSelected = true;
 
                       birthDateInString =
-                          "${birthDate.month}/${birthDate.day}/${birthDate.year}";
+                          "${birthDate.day}-${birthDate.month}-${birthDate.year}";
                     });
                   }
                 }),
@@ -336,7 +336,7 @@ class _RegistrationState extends State<Registration> {
             CustomTextField(
               hint: "سعر الكشف",
               textEditingController: priceController,
-              keyboardType: TextInputType.name,
+              keyboardType: TextInputType.number,
               icon: Icons.monetization_on,
               isPassword: false,
             ),

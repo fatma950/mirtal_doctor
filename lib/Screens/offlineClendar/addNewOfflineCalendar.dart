@@ -125,7 +125,7 @@ class _AddNewOfflineCalenderState extends State<AddNewOfflineCalender> {
                     isDateSelected = true;
 
                     offlineCalendarDateInString =
-                        "${offlineCalendarDate.month}-${offlineCalendarDate.day}-${offlineCalendarDate.year}";
+                        "${offlineCalendarDate.day}-${offlineCalendarDate.month}-${offlineCalendarDate.year}";
                   });
                 }
               }),
